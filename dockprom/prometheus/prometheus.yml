@@ -1,0 +1,92 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  external_labels:
+    monitor: 'docker-host-alpha'
+
+rule_files:
+  - "alert.rules"
+
+scrape_configs:
+  # Prometheus сам
+  - job_name: 'prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+
+  # НОВЫЕ Postgres Exporter
+  - job_name: 'postgres_exporter_molecule'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - 'debian1.molecule.local:9187'
+          - 'debian2.molecule.local:9187'
+          - 'debian3.molecule.local:9187'
+
+  # Метрики patroni
+  # - job_name: 'patroni_exporter_molecule'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets:
+  #         - 'debian1.molecule.local:8008'
+  #         - 'debian2.molecule.local:8008'
+  #         - 'debian3.molecule.local:8008'
+
+  # Метрики вектора
+  # - job_name: 'vector_exporter_molecule'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets:
+  #         - 'debian1.molecule.local:9598'
+  #         - 'debian2.molecule.local:9598'
+  #         - 'debian3.molecule.local:9598'
+
+  # # Общий nodeexporter в докере
+  # - job_name: 'nodeexporter'
+  #   scrape_interval: 5s
+  #   static_configs:
+  #     - targets:
+  #         - 'nodeexporter:9100'
+
+  # # cAdvisor
+  # - job_name: 'cadvisor'
+  #   scrape_interval: 5s
+  #   static_configs:
+  #     - targets:
+  #         - 'cadvisor:8080'
+
+  # # Pushgateway
+  # - job_name: 'pushgateway'
+  #   scrape_interval: 10s
+  #   honor_labels: true
+  #   static_configs:
+  #     - targets:
+  #         - 'pushgateway:9091'
+
+  # # НОВЫЕ Node Exporter на контейнерах Molecule
+  # - job_name: 'node_exporter_molecule'
+  #   scrape_interval: 5s
+  #   static_configs:
+  #     - targets:
+  #         - 'debian1.molecule.local:9100'
+  #         - 'debian2.molecule.local:9100'
+  #         - 'debian3.molecule.local:9100'
+
+  # - job_name: 'nginx'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets: ['nginxexporter:9113']
+
+  # - job_name: 'aspnetcore'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets: ['eventlog-proxy:5000', 'eventlog:5000']
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets:
+            - 'alertmanager:9093'
